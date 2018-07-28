@@ -3,3 +3,8 @@ version: ${project.version}
 main: red.man10.man10quest.Man10Quest
 authors: [Mr_IK, Bounen057, sho0]
 description: Man10 Quest API core
+commands:
+  mquest:
+    description: Man10Quest
+    usage: /<command>
+    default: op

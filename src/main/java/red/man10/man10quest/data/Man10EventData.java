@@ -9,18 +9,24 @@ public class Man10EventData {
     private String event_name;
     private String event_type;
     private String event_description;
+    private String end_message;
+    private String broadcast_type;
     private long reward_balance;
     private String reward_item;
     private String reward_commands;
     private Date time;
 
-    public Man10EventData(int id,String icon,String shown_type,String event_name,String event_type,String event_description,long reward_balance,String reward_item,String reward_commands,Date time){
+    public Man10EventData(int id,String icon,String shown_type,String event_name,String event_type,
+                          String event_description,String end_message,String broadcast_type,long reward_balance,String reward_item,
+                          String reward_commands, Date time){
         this.id = id;
         this.icon = icon;
         this.shown_type = shown_type;
         this.event_name = event_name;
         this.event_type = event_type;
         this.event_description = event_description;
+        this.end_message = end_message;
+        this.broadcast_type = broadcast_type;
         this.reward_balance = reward_balance;
         this.reward_item = reward_item;
         this.reward_commands = reward_commands;
@@ -51,6 +57,14 @@ public class Man10EventData {
         return event_description;
     }
 
+    public String getBroadcast_type() {
+        return broadcast_type;
+    }
+
+    public String getEnd_message() {
+        return end_message;
+    }
+
     public long getReward_balance(){
         return reward_balance;
     }
@@ -62,6 +76,11 @@ public class Man10EventData {
     public String getReward_commands(){
         return reward_commands;
     }
+
+    public Date getTime(){
+        return time;
+    }
+
     //ここまで、get関数
     //ここから、set関数
     public void setIcon(String icon){
@@ -82,6 +101,14 @@ public class Man10EventData {
 
     public void setEvent_description(String event_description) {
         this.event_description = event_description;
+    }
+
+    public void setBroadcast_type(String broadcast_type) {
+        this.broadcast_type = broadcast_type;
+    }
+
+    public void setEnd_message(String end_message) {
+        this.end_message = end_message;
     }
 
     public void setReward_balance(long reward_balance) {
