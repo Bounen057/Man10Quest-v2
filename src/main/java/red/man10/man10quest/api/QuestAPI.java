@@ -85,5 +85,32 @@ public class QuestAPI {
         eventDatas.put(id,eventData);
     }
 
+    public static void editEvent(Man10EventData eventData){
+        if(!eventDatas.containsKey(eventData.getId())){
+            return;
+        }
+        eventDatas.put(eventData.getId(),eventData);
+        saveEvent(eventData);
+    }
+
+    public static void saveEvent(Man10EventData eventData){
+        String sql = "UPDATE man10quest_event SET " +
+                "icon = '"+eventData.getIcon()+"'," +
+                "shown_type = '"+eventData.getShown_type()+"',"+
+                "event_name = '"+eventData.getEvent_name()+"',"+
+                "event_type = '"+eventData.getEvent_type()+"',"+
+                "event_description = '"+eventData.getEvent_description()+"',"+
+                "reward_balance = "+eventData.getReward_balance()+","+
+                "reward_items = '"+eventData.getReward_item()+"',"+
+                "reward_commands = '"+eventData.getReward_commands()+"' WHERE id = "+eventData.getId()+";";
+        plugin.mysql.execute(sql);
+    }
+
+    public static void saveEventAll(){
+        for(Man10EventData eventData:eventDatas.values()){
+            saveEvent(eventData);
+        }
+    }
+
 
 }

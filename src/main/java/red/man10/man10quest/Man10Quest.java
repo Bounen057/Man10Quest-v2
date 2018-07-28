@@ -10,7 +10,7 @@ public final class Man10Quest extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-        saveDefaultConfig();
+        saveDefaultConfig(); // config setUp
         mysql = new MySQLManager(this,"MQuest"); //MySQL setUp
         QuestAPI.loadEnable(this); //Quest API setUp
     }
@@ -18,5 +18,6 @@ public final class Man10Quest extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        QuestAPI.saveEventAll();
     }
 }
