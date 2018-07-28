@@ -3,7 +3,7 @@ package red.man10.man10quest.data;
 import java.util.Date;
 
 public class Man10EventData {
-    private int id;
+    private final int id;
     private String icon;
     private String shown_type;
     private String event_name;

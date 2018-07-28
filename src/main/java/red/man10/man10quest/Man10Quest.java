@@ -19,5 +19,6 @@ public final class Man10Quest extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
         QuestAPI.saveEventAll();
+        QuestAPI.savePlayerAll();
     }
 }

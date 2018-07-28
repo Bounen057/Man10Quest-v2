@@ -3,7 +3,7 @@ package red.man10.man10quest.data;
 import java.util.Date;
 
 public class Man10QuestData {
-    private int id;
+    private final int id;
     private int event_id;
     private String event_name;
     private String event_type;
@@ -71,7 +71,7 @@ public class Man10QuestData {
     //ここから、set関数
 
     public void setEvent_id(int id) {
-        this.id = id;
+        this.event_id = id;
     }
 
     public void setData(String data) {

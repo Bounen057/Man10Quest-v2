@@ -1,5 +1,6 @@
 package red.man10.man10quest.api;
 
+import org.bukkit.entity.Player;
 import red.man10.man10quest.Man10Quest;
 import red.man10.man10quest.data.Man10EventData;
 import red.man10.man10quest.data.Man10QuestData;
@@ -37,12 +38,25 @@ public class QuestAPI {
                 "time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
                 ") ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;";
         plugin.mysql.execute(tableCreateSql); // created man10quest_event table
+        String tableCreateSql2 = "create table if not exists man10quest_player_data("+
+                "id int auto_increment not null primary key," +
+                "event_id int,"+
+                "event_name varchar(128),"+
+                "event_type varchar(64),"+
+                "name varchar(32),"+
+                "uuid varchar(64),"+
+                "data text,"+
+                "finished boolean,"+
+                "start_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
+                "finished_time DATETIME);";
+        plugin.mysql.execute(tableCreateSql2); // created man10quest_player_data table
         //ここから先にロードするコードを書く
         String sql = "SELECT * FROM man10quest_event;";
         ResultSet rs = plugin.mysql.query(sql); // get man10quest_event data
         if (rs != null) {
             eventDatas = EventDatafromResultSet(rs); // set man10quest_event data
         }
+        playerDatas = loadPlayerData();
     }
 
     public static HashMap<Integer,Man10EventData> EventDatafromResultSet(ResultSet rs){
@@ -65,9 +79,46 @@ public class QuestAPI {
             rs.close();
         } catch (NullPointerException | SQLException e1) {
             e1.printStackTrace();
+            plugin.mysql.close();
             return eventDatas;
         }
+        plugin.mysql.close();
         return eventDatas;
+    }
+
+    public static HashMap<UUID,HashMap<Integer,Man10QuestData>> loadPlayerData(){
+        String sql = "SELECT * FROM man10quest_player_data;";
+        ResultSet rs = plugin.mysql.query(sql);
+        HashMap<UUID,HashMap<Integer,Man10QuestData>> playerDatas = new HashMap<>();
+        try {
+            while (rs.next()){
+                String suuid = rs.getString("uuid");
+                UUID uuid = UUID.fromString(suuid);
+                if(!QuestAPI.playerDatas.containsKey(uuid)){
+                    QuestAPI.playerDatas.put(uuid,new HashMap<>());
+                }
+                HashMap<Integer,Man10QuestData> questDatas = QuestAPI.playerDatas.get(uuid);
+                int id = rs.getInt("id");
+                int event_id = rs.getInt("event_id");
+                String event_name = rs.getString("event_name");
+                String event_type = rs.getString("event_type");
+                String name = rs.getString("name");
+                String data = rs.getString("data");
+                boolean finished = rs.getBoolean("finished");
+                Date start_time = rs.getDate("start_time");
+                Date finished_time = rs.getDate("finished_time");
+                Man10QuestData questData = new Man10QuestData(id,event_id,event_name,event_type,name,uuid.toString(),data,finished,start_time,finished_time);
+                questDatas.put(id,questData);
+                playerDatas.put(uuid,questDatas);
+            }
+            rs.close();
+        } catch (NullPointerException | SQLException e1) {
+            e1.printStackTrace();
+            plugin.mysql.close();
+            return playerDatas;
+        }
+        plugin.mysql.close();
+        return playerDatas;
     }
 
     public static void addEvent(Man10EventData eventData){
@@ -112,5 +163,50 @@ public class QuestAPI {
         }
     }
 
+    public static void addPlayerQuest(Man10QuestData man10QuestData){
+        String sql = "INSERT INTO man10quest_player_data (event_id,event_name,event_type,name,uuid,data,finished,finished_time) VALUES (" +
+                man10QuestData.getEvent_id()+"," +
+                "'"+man10QuestData.getEvent_name()+"'," +
+                "'"+man10QuestData.getEvent_type()+"'," +
+                "'"+man10QuestData.getName()+"'," +
+                "'"+man10QuestData.getUuid()+"'," +
+                "'"+man10QuestData.getData()+"'," +
+                ""+man10QuestData.isFinished()+"," +
+                null+");";
+        plugin.mysql.execute(sql);
+        HashMap<Integer,Man10QuestData> data = playerDatas.get(UUID.fromString(man10QuestData.getUuid()));
+        data.put(playerDatas.size()+1,man10QuestData);
+        playerDatas.put(UUID.fromString(man10QuestData.getUuid()),data);
+    }
+
+    public static void savePlayerQuest(Man10QuestData man10QuestData){
+        String sql = "UPDATE man10quest_player_data SET " +
+                "event_id = "+man10QuestData.getEvent_id()+"," +
+                "event_name = '"+man10QuestData.getEvent_name()+"'," +
+                "event_type = '"+man10QuestData.getEvent_type()+"'," +
+                "name = '"+man10QuestData.getName()+"'," +
+                "uuid = '"+man10QuestData.getUuid()+"'," +
+                "data = '"+man10QuestData.getData()+"'," +
+                "finished = "+man10QuestData.isFinished()+"," +
+                "finished_time = "+man10QuestData.getFinished_time()+" WHERE id = "+man10QuestData.getId()+";";
+        plugin.mysql.execute(sql);
+    }
+
+    public static void editPlayerQuest(Man10QuestData man10QuestData){
+        if(!QuestAPI.playerDatas.containsKey(UUID.fromString(man10QuestData.getUuid()))){
+            return;
+        }
+        HashMap<Integer,Man10QuestData> data = playerDatas.get(UUID.fromString(man10QuestData.getUuid()));
+        data.put(man10QuestData.getId(),man10QuestData);
+        QuestAPI.playerDatas.put(UUID.fromString(man10QuestData.getUuid()),data);
+    }
+
+    public static void savePlayerAll(){
+        for(HashMap<Integer,Man10QuestData> data:QuestAPI.playerDatas.values()){
+            for(Man10QuestData qdata : data.values()) {
+                savePlayerQuest(qdata);
+            }
+        }
+    }
 
 }
