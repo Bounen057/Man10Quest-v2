@@ -1,5 +1,7 @@
 package red.man10.man10quest.data;
 
+import java.util.Date;
+
 public class Man10EventData {
     private int id;
     private String icon;
@@ -10,8 +12,9 @@ public class Man10EventData {
     private long reward_balance;
     private String reward_item;
     private String reward_commands;
+    private Date time;
 
-    public Man10EventData(int id,String icon,String shown_type,String event_name,String event_type,String event_description,long reward_balance,String reward_item,String reward_commands){
+    public Man10EventData(int id,String icon,String shown_type,String event_name,String event_type,String event_description,long reward_balance,String reward_item,String reward_commands,Date time){
         this.id = id;
         this.icon = icon;
         this.shown_type = shown_type;
@@ -21,6 +24,7 @@ public class Man10EventData {
         this.reward_balance = reward_balance;
         this.reward_item = reward_item;
         this.reward_commands = reward_commands;
+        this.time = time;
     }
 
     public int getId(){
