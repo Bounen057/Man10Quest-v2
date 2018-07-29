@@ -35,7 +35,7 @@ public class QuestCore {
                 if (event == null) {
                     continue;
                 }
-                if (dataIsnoOpenHide(event)) {
+                if (dataIsOpenHide(event)) {
                     continue;
                 }
                 Bukkit.getPlayer(uuid).sendMessage(QuestAPI.plugin.prefix + data.getEvent_id() + ": §e" + event.getEvent_name() + " §6" + event.getEvent_description());

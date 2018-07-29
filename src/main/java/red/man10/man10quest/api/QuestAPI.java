@@ -21,12 +21,6 @@ import java.util.UUID;
 
 public class QuestAPI {
 
-    static class shown_Type {
-        static String hide = "hide";
-        static String no_open_hide = "no_open_hide";
-        static String open_hide = "open_hide";
-        static String free = "free";
-    }
 
     static Man10Quest plugin; //メインクラス変数
     static HashMap<Integer,Man10EventData> eventDatas; //イベントデータ(メモリ)の記録HashMap
@@ -301,7 +295,7 @@ public class QuestAPI {
                 null + ");";
         plugin.mysql.execute(sql);
         datass = getPlayerQuestfromQuestId(UUID.fromString(uuid),eventid);
-        if(datass != null){
+        if(datass == null){
             return -1;
         }
         datas.put(datass.getId(), datass);
@@ -389,11 +383,11 @@ public class QuestAPI {
             plugin.mysql.execute(sql);
     }
 
-    public static void successQuest(Man10QuestData man10QuestData){
+    public static boolean successQuest(Man10QuestData man10QuestData){
+        if (man10QuestData.isFinished()) {
+            return false;
+        }
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            if (man10QuestData.isFinished()) {
-                return;
-            }
             man10QuestData.setFinished(true);
             editPlayerQuest(man10QuestData);
             Man10EventData event = eventDatas.get(man10QuestData.getEvent_id());
@@ -407,7 +401,11 @@ public class QuestAPI {
             } else {
                 if (Bukkit.getPlayer(UUID.fromString(man10QuestData.getUuid())) != null) {
                     Bukkit.getPlayer(UUID.fromString(man10QuestData.getUuid())).sendMessage(plugin.prefix + event.getEnd_message().replace("[user_name]", man10QuestData.getName()));
+
                 }
+            }
+            if (Bukkit.getPlayer(UUID.fromString(man10QuestData.getUuid())) != null) {
+                Bukkit.getPlayer(UUID.fromString(man10QuestData.getUuid())).playSound(Bukkit.getPlayer(UUID.fromString(man10QuestData.getUuid())).getLocation(),Sound.ENTITY_PLAYER_LEVELUP,1.0F,1.0F);
             }
             if (!event.getReward_item().equalsIgnoreCase("null")) {
                 if (Bukkit.getPlayer(UUID.fromString(man10QuestData.getUuid())) != null) {
@@ -430,6 +428,7 @@ public class QuestAPI {
             plugin.vault.givePlayerMoney(UUID.fromString(man10QuestData.getUuid()), event.getReward_balance(), TransactionType.WIN, "quest reward id: " + event.getId());
             savePlayerQuest(man10QuestData);
         });
+        return true;
     }
 
     public static void editPlayerQuest(Man10QuestData man10QuestData){
