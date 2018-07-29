@@ -25,16 +25,22 @@ public class QuestCore {
     }
 
     public static void listView(UUID uuid){
-        if(!QuestAPI.playerDatas.containsKey(uuid)){
-            Bukkit.getPlayer(uuid).sendMessage("§cあなたが待機中のクエストは存在しない");
-        }
-        for(Man10QuestData data:QuestAPI.playerDatas.get(uuid).values()){
-            Man10EventData event = QuestAPI.eventDatas.get(data.getEvent_id());
-            if(dataIsnoOpenHide(event)) {
-                continue;
+        Bukkit.getScheduler().runTaskAsynchronously(QuestAPI.plugin, () -> {
+            if (!QuestAPI.playerDatas.containsKey(uuid)) {
+                Bukkit.getPlayer(uuid).sendMessage("§cあなたが待機中のクエストは存在しない");
+                return;
             }
-            Bukkit.getPlayer(uuid).sendMessage(QuestAPI.plugin.prefix+data.getEvent_id()+": §e"+event.getEvent_name()+" §6"+event.getEvent_description());
-        }
+            for (Man10QuestData data : QuestAPI.playerDatas.get(uuid).values()) {
+                Man10EventData event = QuestAPI.getQuestfromId(data.getId());
+                if (event == null) {
+                    continue;
+                }
+                if (dataIsnoOpenHide(event)) {
+                    continue;
+                }
+                Bukkit.getPlayer(uuid).sendMessage(QuestAPI.plugin.prefix + data.getEvent_id() + ": §e" + event.getEvent_name() + " §6" + event.getEvent_description());
+            }
+        });
     }
 
 }
