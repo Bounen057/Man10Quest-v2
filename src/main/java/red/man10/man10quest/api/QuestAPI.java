@@ -300,6 +300,10 @@ public class QuestAPI {
         }
         datas.put(datass.getId(), datass);
         playerDatas.put(UUID.fromString(uuid), datas);
+        if(Bukkit.getPlayer(UUID.fromString(uuid))!=null){
+            Bukkit.getPlayer(UUID.fromString(uuid)).sendMessage(plugin.prefix+"§e§lクエスト 『"+event_name+"§e§l』が開放されました！");
+            Bukkit.getPlayer(UUID.fromString(uuid)).playSound(Bukkit.getPlayer(UUID.fromString(uuid)).getLocation(),Sound.ENTITY_PLAYER_LEVELUP,1.0F,1.0F);
+        }
         return datass.getId();
     }
 
